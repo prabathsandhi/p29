@@ -1,0 +1,46 @@
+<!-- Login Page -->
+<div *ngIf="!loggedIn" class="login-container">
+  <h2>Login</h2>
+  <form (ngSubmit)="login()">
+    <label for="username">Username</label>
+    <input type="text" id="username" [(ngModel)]="username" name="username" required>
+    
+    <label for="password">Password</label>
+    <input type="password" id="password" [(ngModel)]="password" name="password" required>
+    
+    <button type="submit">Login</button>
+  </form>
+</div>
+
+<!-- Dashboard Page -->
+<div *ngIf="loggedIn" class="dashboard-container">
+  <nav>
+    <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+    <a routerLink="/summary" routerLinkActive="active">Summary</a>
+    <a routerLink="/reports" routerLinkActive="active">Reports</a>
+    <button (click)="logout()">Logout</button>
+  </nav>
+
+  <h1>Dashboard</h1>
+
+  <!-- Summary of the Topic -->
+  <div class="summary">
+    <p>{{ summary?.text }}</p>
+    <a href="{{ summary?.source }}" target="_blank">Read more</a>
+  </div>
+
+  <!-- Tech Stack and Infrastructure Description -->
+  <div class="tech-stack">
+    <h3>Technical Aspects of the Project</h3>
+    <p>
+      The frontend of this project is built using <strong>Angular</strong>, providing a dynamic single-page application (SPA). The backend is implemented using <strong>Python</strong> with the <strong>Flask</strong> framework, which handles HTTP requests and manages the authentication process via <strong>JWT</strong> (JSON Web Token). The database is <strong>MySQL</strong>, where user data and other necessary information are stored. The system is served using <strong>NGINX</strong> to host the frontend application, while the backend API runs on a separate server on port 3000. This architecture allows for a decoupled and scalable system where the frontend and backend are independently maintained.
+    </p>
+  </div>
+
+  <!-- Chart for Reports -->
+  <div *ngIf="chartData" class="chart">
+    <h2>Report Data Chart</h2>
+    <svg id="chartContainer"></svg> <!-- D3.js will render the chart -->
+    <p>Chart showing generative AI's growth over the past few years. Data source: example.com</p>
+  </div>
+</div>
