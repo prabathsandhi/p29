@@ -39,12 +39,18 @@ function tokenRequired(req, res, next) {
         }
     }
 }
-
-// Routes
+// login Route
 app.post('/login', async (req, res) => {
     try {
         const { username, password } = req.body;
 
+        // Hardcoded login for default user
+        if (username === 'John' && password === 'John') {
+            const token = jwt.sign({ user: username }, SECRET_KEY, { expiresIn: '1h' });
+            return res.json({ token });
+        }
+
+        // Database-based login for other users
         const connection = await mysql.createConnection(dbConfig);
         const [rows] = await connection.execute(
             'SELECT * FROM users WHERE username = ? AND password = ?',
@@ -63,6 +69,7 @@ app.post('/login', async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error!' });
     }
 });
+
 
 app.get('/dashboard', (req, res) => {
     const summary = {
