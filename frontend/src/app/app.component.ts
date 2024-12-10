@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms'; // Import FormsModule
 import { CommonModule } from '@angular/common'; // Import CommonModule
 import * as d3 from 'd3';
+import { isPlatformBrowser } from '@angular/common';
 
 // Define a type for the chart data
 interface ChartData {
@@ -26,13 +27,19 @@ export class AppComponent implements OnInit {
   public techStack: any;
   public chartData: ChartData[] = [];
 
-  constructor(public router: Router, private http: HttpClient) {}
+  constructor(
+    public router: Router,
+    private http: HttpClient,
+    @Inject(PLATFORM_ID) private platformId: any // Inject PLATFORM_ID for platform checks
+  ) {}
 
   ngOnInit(): void {
-    const token = localStorage.getItem('token');
-    if (token) {
-      this.loggedIn = true;
-      this.getDashboardData();
+    if (isPlatformBrowser(this.platformId)) {
+      const token = localStorage.getItem('token');
+      if (token) {
+        this.loggedIn = true;
+        this.getDashboardData();
+      }
     }
   }
 
@@ -42,7 +49,9 @@ export class AppComponent implements OnInit {
       password: this.password
     }).subscribe(response => {
       if (response.token) {
-        localStorage.setItem('token', response.token);
+        if (isPlatformBrowser(this.platformId)) {
+          localStorage.setItem('token', response.token);
+        }
         this.loggedIn = true;
         this.getDashboardData();
         this.router.navigate(['/dashboard']);
@@ -53,26 +62,30 @@ export class AppComponent implements OnInit {
   }
 
   getDashboardData() {
-    this.http.get<any>('http://localhost:3000/dashboard', {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
-      }
-    }).subscribe(response => {
-      this.summary = response.summary;
-      this.techStack = response.tech_stack;
-      this.getChartData();
-    });
+    if (isPlatformBrowser(this.platformId)) {
+      this.http.get<any>('http://localhost:3000/dashboard', {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      }).subscribe(response => {
+        this.summary = response.summary;
+        this.techStack = response.tech_stack;
+        this.getChartData();
+      });
+    }
   }
 
   getChartData() {
-    this.http.get<any>('http://localhost:3000/chart_data', {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
-      }
-    }).subscribe(response => {
-      this.chartData = response.data.filter((d: ChartData) => d.value !== undefined);
-      this.renderChart();
-    });
+    if (isPlatformBrowser(this.platformId)) {
+      this.http.get<any>('http://localhost:3000/chart_data', {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      }).subscribe(response => {
+        this.chartData = response.data.filter((d: ChartData) => d.value !== undefined);
+        this.renderChart();
+      });
+    }
   }
 
   renderChart() {
@@ -125,7 +138,9 @@ export class AppComponent implements OnInit {
   }
 
   logout() {
-    localStorage.removeItem('token');
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.removeItem('token');
+    }
     this.loggedIn = false;
     this.router.navigate(['/login']);
   }
