@@ -12,4 +12,4 @@ CREATE TABLE users (
 
 -- Insert a test user (First Name as both username and password)
 INSERT INTO users (first_name, last_name, username, password)
-VALUES ('John', 'Doe', 'John', 'John');
+VALUES ('Prabath ', 'Prabath ', 'Prabath ', 'Prabath ');
